@@ -1,70 +1,113 @@
 import pygame
+import random
 
 pygame.init()
 
-# Taille de la fenêtre
+# Window size
 WIDTH = 600
 HEIGHT = 600
 
-# Taille d'une case de la grille
+# Size of one grid cell
 CELL_SIZE = 20
 
-# Création de la fenêtre
+# Number of cells in the grid
+GRID_WIDTH = WIDTH // CELL_SIZE
+GRID_HEIGHT = HEIGHT // CELL_SIZE
+
+# Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("My Snake")
 
-# Horloge pour contrôler la vitesse
+# Clock used to control the game speed
 clock = pygame.time.Clock()
 
-# Position du serpent dans la grille
-snake_x = 10
-snake_y = 10
+# Snake position in the grid
+snake_body = [
+    [10,10]
+]
 
-direction_x = 1  # Initial direction: right
+# Food position in the grid
+food_x = random.randint(0, GRID_WIDTH - 1)
+food_y = random.randint(0, GRID_HEIGHT - 1)
+
+# Initial movement direction
+# The snake starts by moving to the right
+direction_x = 1
 direction_y = 0
 
+# Main game loop condition
 running = True
 
 while running:
-    # 1. Gestion des événements
+    # Handle user events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        # Handle keyboard input
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
+            if event.key == pygame.K_LEFT and direction_x != 1:
                 direction_x = -1
                 direction_y = 0
-            elif event.key == pygame.K_RIGHT:
+
+            elif event.key == pygame.K_RIGHT and direction_x != -1:
                 direction_x = 1
                 direction_y = 0
-            elif event.key == pygame.K_UP:
+
+            elif event.key == pygame.K_UP and direction_y != 1:
                 direction_x = 0
                 direction_y = -1
-            elif event.key == pygame.K_DOWN:
+
+            elif event.key == pygame.K_DOWN and direction_y != -1:
                 direction_x = 0
                 direction_y = 1
 
+    # Move the snake by one cell
+    [snake_x, snake_y] = snake_body[0]
     snake_x += direction_x
     snake_y += direction_y
+    snake_body.insert(0, [snake_x, snake_y])
+
+    # Check if the snake hits the wall
+    if snake_x < 0 or snake_x >= GRID_WIDTH or snake_y < 0 or snake_y >= GRID_HEIGHT:
+        running = False
+
+    if (snake_x == food_x) and (snake_y == food_y):
+        # The snake eats the food, we generate new food
+        food_x = random.randint(0, GRID_WIDTH - 1)
+        food_y = random.randint(0, GRID_HEIGHT - 1)
+    else:
+        # The snake moves without eating, we remove the tail
+        snake_body.pop()
+
+    for segment in snake_body[1:]:
+        if segment == [snake_x, snake_y]:
+            # The snake hits itself
+            running = False
     
-    # 2. Dessiner le fond
+    # Clear the screen
     screen.fill((0, 0, 0))
 
-    # 3. Convertir la position grille en pixels
-    pixel_x = snake_x * CELL_SIZE
-    pixel_y = snake_y * CELL_SIZE
+    for segment in snake_body:
+        pixel_x = segment[0] * CELL_SIZE
+        pixel_y = segment[1] * CELL_SIZE
+        pygame.draw.rect(
+            screen,
+            (0, 255, 0),
+            (pixel_x, pixel_y, CELL_SIZE, CELL_SIZE)
+        )
 
-    # 4. Dessiner le serpent
-    pygame.draw.rect(
+    pygame.draw.circle(
         screen,
-        (0, 255, 0),
-        (pixel_x, pixel_y, CELL_SIZE, CELL_SIZE)
+        (255, 0, 0),
+        (food_x * CELL_SIZE + CELL_SIZE // 2, food_y * CELL_SIZE + CELL_SIZE // 2),
+        CELL_SIZE // 2
     )
 
-    # 5. Mettre à jour l'écran
+    # Update the display
     pygame.display.update()
 
-    # 6. Limiter la vitesse
-    clock.tick(10)
+    # Limit the game speed
+    clock.tick(7)
 
 pygame.quit()
