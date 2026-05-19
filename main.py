@@ -20,6 +20,8 @@ clock = pygame.time.Clock()
 snake_x = 10
 snake_y = 10
 
+direction_x = 1  # Initial direction: right
+direction_y = 0
 
 running = True
 
@@ -30,14 +32,21 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                snake_x -= 1  # Exemple de mouvement vers la gauche
+                direction_x = -1
+                direction_y = 0
             elif event.key == pygame.K_RIGHT:
-                snake_x += 1  # Exemple de mouvement vers la droite
+                direction_x = 1
+                direction_y = 0
             elif event.key == pygame.K_UP:
-                snake_y -= 1  # Exemple de mouvement vers le haut
+                direction_x = 0
+                direction_y = -1
             elif event.key == pygame.K_DOWN:
-                snake_y += 1  # Exemple de mouvement vers le bas
+                direction_x = 0
+                direction_y = 1
 
+    snake_x += direction_x
+    snake_y += direction_y
+    
     # 2. Dessiner le fond
     screen.fill((0, 0, 0))
 
