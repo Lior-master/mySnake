@@ -15,9 +15,10 @@ CELL_SIZE = 20
 GRID_WIDTH = WIDTH // CELL_SIZE
 GRID_HEIGHT = HEIGHT // CELL_SIZE
 
+SCORE = 0
+
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("My Snake")
 
 # Clock used to control the game speed
 clock = pygame.time.Clock()
@@ -31,7 +32,7 @@ snake_body = [
 ]
 
 # Food position in the grid
-food_coord = food_generation(GRID_WIDTH, GRID_HEIGHT)
+food_coord = food_generation(snake_body,GRID_WIDTH, GRID_HEIGHT)
 
 # Initial movement direction
 # The snake starts by moving to the right
@@ -90,7 +91,8 @@ while running:
 
     if snake_body[0] == list(food_coord):
         # The snake eats the food, we generate new food
-        food_coord = food_generation(GRID_WIDTH, GRID_HEIGHT)
+        food_coord = food_generation(snake_body, GRID_WIDTH, GRID_HEIGHT)
+        SCORE += 1
     else:
         # The snake moves without eating, we remove the tail
         snake_body.pop()
@@ -118,6 +120,8 @@ while running:
         (food_coord[0] * CELL_SIZE + CELL_SIZE // 2, food_coord[1] * CELL_SIZE + CELL_SIZE // 2),
         CELL_SIZE // 2
     )
+
+    pygame.display.set_caption("My Snake - Score: " + str(SCORE))
 
     # Update the display
     pygame.display.update()
