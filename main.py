@@ -1,5 +1,6 @@
 import pygame
 from food import food_drawing, food_generation
+import gameplay
 from settings import Settings
 from the_snake import Snake
 
@@ -8,7 +9,7 @@ pygame.init()
 settings = Settings(400, 400)
 
 # Create the game window
-screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+screen = pygame.display.set_mode((settings.width, settings.height))
 
 # Clock used to control the game speed
 clock = pygame.time.Clock()
@@ -17,7 +18,7 @@ clock = pygame.time.Clock()
 snake = Snake(settings)
 
 # Food position in the grid
-food_coord = food_generation(snake.body, settings.Grid_Width, settings.Grid_Height)
+food_coord = food_generation(snake.body, settings)
 
 # Main game loop condition
 running = True
@@ -40,7 +41,7 @@ while running:
 
     food_coord = snake.check_eat_food(food_coord,settings)
 
-    running = snake.check_self_collision()
+    running = snake.is_alive()
     
     # Clear the screen
     screen.fill((0, 0, 0))
@@ -51,15 +52,15 @@ while running:
     # Draw the food
     food_drawing(screen, food_coord, settings)
 
-    pygame.display.set_caption("My Snake - Score: " + str(settings.SCORE))
+    pygame.display.set_caption("My Snake - Score: " + str(gameplay.SCORE))
 
     # Update the display
     pygame.display.update()
     DIRECTION_CHANGED = False
     # Limit the game speed
-    clock.tick(settings.FPS)
+    clock.tick(settings.fps)
 
-settings.game_over(screen)
+gameplay.game_over(settings,screen)
 
 pygame.quit()
 exit()
