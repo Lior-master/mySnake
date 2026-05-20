@@ -98,8 +98,7 @@ while running:
         snake_body.pop()
 
     for segment in snake_body[1:]:
-        if segment == [snake_x, snake_y]:
-            # The snake hits itself
+        if segment == snake_body[0]:
             running = False
     
     # Clear the screen
