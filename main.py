@@ -2,7 +2,6 @@ import pygame
 from food import food_drawing, food_generation
 from settings import Settings
 from the_snake import Snake
-from logique_mouvement import DIRECTION_CHANGED, forward_the_wall, move_snake, touche_mov
 
 pygame.init()
 
@@ -20,42 +19,28 @@ snake = Snake(settings)
 # Food position in the grid
 food_coord = food_generation(snake.body, settings.Grid_Width, settings.Grid_Height)
 
-# Initial movement direction
-# The snake starts by moving to the right
-snake.direction = (1, 0)
-
 # Main game loop condition
 running = True
+DIRECTION_CHANGED = False
 
 while running:
     # Handle user events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            exit()
 
         # Handle keyboard input
         elif not DIRECTION_CHANGED:
-            DIRECTION_CHANGED = touche_mov(snake, event, DIRECTION_CHANGED)
+            DIRECTION_CHANGED = snake.touche_mov(event, DIRECTION_CHANGED)
 
     # Move the snake by one cell
-    move_snake(snake)
-
-    # Handle the snake going through the walls (wrap around)
-
-    forward_the_wall(snake, settings)
+    snake.move(settings)
 
 
-    if snake.body[0] == list(food_coord):
-        # The snake eats the food, we generate new food
-        food_coord = food_generation(snake.body, settings.Grid_Width, settings.Grid_Height)
-        settings.SCORE += 1
-    else:
-        # The snake moves without eating, we remove the tail
-        snake.body.pop()
+    food_coord = snake.check_eat_food(food_coord,settings)
 
-    for segment in snake.body[1:]:
-        if segment == snake.body[0]:
-            running = False
+    running = snake.check_self_collision()
     
     # Clear the screen
     screen.fill((0, 0, 0))
@@ -74,5 +59,7 @@ while running:
     # Limit the game speed
     clock.tick(settings.FPS)
 
+settings.game_over(screen)
 
 pygame.quit()
+exit()
