@@ -1,5 +1,6 @@
 import pygame
 import random
+from food import food_generation
 
 pygame.init()
 
@@ -23,12 +24,14 @@ clock = pygame.time.Clock()
 
 # Snake position in the grid
 snake_body = [
-    [10,10]
+    [10,10],
+    [9,10],
+    [8,10]
+
 ]
 
 # Food position in the grid
-food_x = random.randint(0, GRID_WIDTH - 1)
-food_y = random.randint(0, GRID_HEIGHT - 1)
+food_coord = food_generation(GRID_WIDTH, GRID_HEIGHT)
 
 # Initial movement direction
 # The snake starts by moving to the right
@@ -72,10 +75,9 @@ while running:
     if snake_x < 0 or snake_x >= GRID_WIDTH or snake_y < 0 or snake_y >= GRID_HEIGHT:
         running = False
 
-    if (snake_x == food_x) and (snake_y == food_y):
+    if (snake_x == food_coord[0]) and (snake_y == food_coord[1]):
         # The snake eats the food, we generate new food
-        food_x = random.randint(0, GRID_WIDTH - 1)
-        food_y = random.randint(0, GRID_HEIGHT - 1)
+        food_coord = food_generation(GRID_WIDTH, GRID_HEIGHT)
     else:
         # The snake moves without eating, we remove the tail
         snake_body.pop()
@@ -100,7 +102,7 @@ while running:
     pygame.draw.circle(
         screen,
         (255, 0, 0),
-        (food_x * CELL_SIZE + CELL_SIZE // 2, food_y * CELL_SIZE + CELL_SIZE // 2),
+        (food_coord[0] * CELL_SIZE + CELL_SIZE // 2, food_coord[1] * CELL_SIZE + CELL_SIZE // 2),
         CELL_SIZE // 2
     )
 
