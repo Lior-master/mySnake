@@ -40,6 +40,7 @@ direction_y = 0
 
 # Main game loop condition
 running = True
+direction_changed = False
 
 while running:
     # Handle user events
@@ -48,22 +49,26 @@ while running:
             running = False
 
         # Handle keyboard input
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN and not direction_changed:
             if event.key == pygame.K_LEFT and direction_x != 1:
                 direction_x = -1
                 direction_y = 0
+                direction_changed = True
 
             elif event.key == pygame.K_RIGHT and direction_x != -1:
                 direction_x = 1
                 direction_y = 0
+                direction_changed = True
 
             elif event.key == pygame.K_UP and direction_y != 1:
                 direction_x = 0
                 direction_y = -1
+                direction_changed = True
 
             elif event.key == pygame.K_DOWN and direction_y != -1:
                 direction_x = 0
                 direction_y = 1
+                direction_changed = True
 
     # Move the snake by one cell
     [snake_x, snake_y] = snake_body[0]
@@ -71,11 +76,19 @@ while running:
     snake_y += direction_y
     snake_body.insert(0, [snake_x, snake_y])
 
-    # Check if the snake hits the wall
-    if snake_x < 0 or snake_x >= GRID_WIDTH or snake_y < 0 or snake_y >= GRID_HEIGHT:
-        running = False
+    # Handle the snake going through the walls (wrap around)
 
-    if (snake_x == food_coord[0]) and (snake_y == food_coord[1]):
+    if snake_body[0][0] < 0:
+        snake_body[0][0] = GRID_WIDTH - 1
+    elif snake_body[0][0] >= GRID_WIDTH:
+        snake_body[0][0] = 0
+    if snake_body[0][1] < 0:
+        snake_body[0][1] = GRID_HEIGHT - 1
+    elif snake_body[0][1] >= GRID_HEIGHT:
+        snake_body[0][1] = 0
+
+
+    if snake_body[0] == list(food_coord):
         # The snake eats the food, we generate new food
         food_coord = food_generation(GRID_WIDTH, GRID_HEIGHT)
     else:
@@ -108,7 +121,7 @@ while running:
 
     # Update the display
     pygame.display.update()
-
+    direction_changed = False
     # Limit the game speed
     clock.tick(7)
 
